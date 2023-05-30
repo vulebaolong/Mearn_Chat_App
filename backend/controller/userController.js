@@ -39,18 +39,23 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    const isPassword = await user.matchPassword(password);
-    if (user && isPassword) {
-        res.status(201).send({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            pic: user.pic,
-            token: createToken(user._id),
-        });
-        console.log(`đăng nhập tk ${user.name} thành công`);
-    } else {
+    try {
+        const user = await User.findOne({ email });
+        const isPassword = await user.matchPassword(password);
+        if (user && isPassword) {
+            res.status(201).send({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                pic: user.pic,
+                token: createToken(user._id),
+            });
+            console.log(`đăng nhập tk ${user.name} thành công`);
+        } else {
+            res.status(400);
+            throw new Error("Email hoặc mật khẩu chưa đúng");
+        }
+    } catch (error) {
         res.status(400);
         throw new Error("Email hoặc mật khẩu chưa đúng");
     }

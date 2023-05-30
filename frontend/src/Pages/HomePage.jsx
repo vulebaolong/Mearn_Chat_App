@@ -11,8 +11,15 @@ import {
 import React from "react";
 import Login from "../Components/Authentication/Login";
 import SignUp from "../Components/Authentication/SignUp";
+import { useHistory } from "react-router-dom";
 
-function HomePage() {
+function HomePage(props) {
+    const history = useHistory();
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+    if (user) {
+        console.log(user);
+        history.push("/chats");
+    }
     return (
         <Container maxW="xl" centerContent={true}>
             <Box

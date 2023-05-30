@@ -15,8 +15,8 @@ import axios from "axios";
 
 function Login() {
     const [show, setShow] = useState(false);
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const toast = useToast();
     const history = useHistory();
@@ -30,8 +30,10 @@ function Login() {
     const handleSubmit = async () => {
         setLoading(true);
         if (!email || !password) {
-            Toast({
-                title: "Xin vui lòng nhập các thông tin",
+            console.log(email, password);
+            toast({
+                title: "Có lỗi",
+                description: "Xin vui lòng nhập các trường",
                 status: "warning",
                 duration: 5000,
                 isClosable: true,
@@ -59,14 +61,14 @@ function Login() {
                 isClosable: true,
                 position: "bottom",
             });
-            localStorage.setItem("userInfo", JSON.stringify(data));
             setLoading(false);
             history.push("/chats");
+            localStorage.setItem("userInfo", JSON.stringify(data));
         } catch (error) {
             console.log("👙  error: ", error);
             toast({
                 title: "Có lỗi",
-                description: error.message,
+                description: error.response.data.message,
                 status: "error",
                 duration: 5000,
                 isClosable: true,
