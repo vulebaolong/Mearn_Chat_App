@@ -6,8 +6,11 @@ import {
     InputGroup,
     InputRightElement,
     VStack,
+    useToast,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
+import axios from "axios";
 
 function SignUp() {
     const [show, setShow] = useState(false);
@@ -15,15 +18,119 @@ function SignUp() {
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
     const [confirmpassword, setConfirmpassword] = useState();
-    const [pic, setPic] = useState();
+    const [pic, setPic] = useState("");
+    const toast = useToast();
+    const [loading, setLoading] = useState(false);
+    const history = useHistory();
 
     const handleClickShow = () => {
         setShow(!show);
     };
 
-    const postDetail = (params) => {};
+    const postDetail = (pics) => {
+        setLoading(true);
+        if (pics === undefined) {
+            toast({
+                title: "Xin vui lòng chọn Hình ảnh",
+                status: "warning",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            return;
+        }
 
-    const handleSubmit = (params) => {};
+        if (pics.type === "image/jpeg" || pics.type === "image/png") {
+            const data = new FormData();
+            data.append("file", pics);
+            data.append("upload_preset", "Mearn-chat-app");
+            data.append("cloud_name", "vulebaolong");
+            fetch("https://api.cloudinary.com/v1_1/vulebaolong/image/upload", {
+                method: "post",
+                body: data,
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    const url = data.url;
+                    setPic(url);
+                    setLoading(false);
+                })
+                .catch((error) => {
+                    console.log(error);
+                    setLoading(false);
+                });
+        } else {
+            toast({
+                title: "Xin vui lòng chọn Hình ảnh",
+                status: "warning",
+                duration: 9000,
+                isClosable: true,
+                position: "bottom-left",
+            });
+            setLoading(false);
+        }
+    };
+
+    const handleSubmit = async () => {
+        setLoading(true);
+        if (!name || !email || !password || !confirmpassword) {
+            toast({
+                title: "Xin vui lòng nhập các thông tin",
+                status: "warning",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            setLoading(false);
+            return;
+        }
+
+        if (password !== confirmpassword) {
+            toast({
+                title: "Mật khẩu nhập lại không khớp",
+                status: "warning",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const config = {
+                headers: {
+                    "Content-type": "application/json",
+                },
+            };
+            const { data } = await axios.post(
+                "api/v1/user/register",
+                { name, email, password, pic },
+                config
+            );
+            toast({
+                title: "Đăng ký thành công",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            localStorage.setItem("userInfo", JSON.stringify(data));
+            setLoading(false);
+            history.push("/chats");
+        } catch (error) {
+            console.log("👙  error: ", error);
+            toast({
+                title: "Có lỗi",
+                description: error.message,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            setLoading(false);
+        }
+    };
     return (
         <VStack spacing={"5px"}>
             <FormControl isRequired>
@@ -99,6 +206,7 @@ function SignUp() {
                 onClick={() => {
                     handleSubmit();
                 }}
+                isLoading={loading}
             >
                 Signup
             </Button>
