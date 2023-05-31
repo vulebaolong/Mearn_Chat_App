@@ -1,31 +1,16 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Box } from "@chakra-ui/react";
 import SideDrawer from "../Components/Anothor/SideDrawer";
 import MyChats from "../Components/Anothor/MyChats";
 import ChatBox from "../Components/Anothor/ChatBox";
+import { connect } from "mongoose";
 
 function ChatPage(props) {
-    const [chats, setChats] = useState([]);
-
+    const { user } = props;
     const history = useHistory();
-    const user = JSON.parse(localStorage.getItem("userInfo"));
-
-    if (!user) {
-        console.log(user);
-        history.push("/");
-    }
-
-    const fetchChats = async () => {
-        // const { data } = await axios.get("/api/v1/chats");
-        // console.log(data);
-        // setChats(data.chats);
-    };
-
-    useEffect(() => {
-        fetchChats();
-    }, []);
+    if (!user) history.push("/");
+    const [fetchAgain, setFetchAgain] = useState(false);
     return (
         <div style={{ width: "100%" }}>
             {user && <SideDrawer />}
@@ -36,11 +21,18 @@ function ChatPage(props) {
                 h={"91.5vh"}
                 p={"10px"}
             >
-                {user && <MyChats />}
-                {user && <ChatBox />}
+                {user && <MyChats fetchAgain={fetchAgain} />}
+                {user && (
+                    <ChatBox fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+                )}
             </Box>
         </div>
     );
 }
+const mapStateToProps = (state) => {
+    return {
+        user: state.chatReducer.user,
+    };
+};
 
-export default ChatPage;
+export default connect(mapStateToProps)(ChatPage);

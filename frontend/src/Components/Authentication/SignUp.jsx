@@ -11,8 +11,11 @@ import {
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
+import { connect } from "react-redux";
 
-function SignUp() {
+function SignUp(props) {
+    const { setUsers } = props;
+
     const [show, setShow] = useState(false);
     const [name, setName] = useState();
     const [email, setEmail] = useState();
@@ -116,6 +119,7 @@ function SignUp() {
                 position: "bottom",
             });
             localStorage.setItem("userInfo", JSON.stringify(data));
+            setUsers(data);
             setLoading(false);
             history.push("/chats");
         } catch (error) {
@@ -213,5 +217,16 @@ function SignUp() {
         </VStack>
     );
 }
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setUsers: (data) => {
+            const action = {
+                type: "SET_USER",
+                payload: data,
+            };
+            dispatch(action);
+        },
+    };
+};
 
-export default SignUp;
+export default connect(null, mapDispatchToProps)(SignUp);

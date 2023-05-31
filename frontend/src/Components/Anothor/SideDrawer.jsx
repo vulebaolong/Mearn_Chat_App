@@ -29,7 +29,7 @@ import UserItem from "./UserItem";
 import { connect } from "react-redux";
 
 function SideDrawer(props) {
-    const { setSelectedChat, chats, setChats } = props;
+    const { setSelectedChat, chats, setChats, setUser } = props;
     const user = JSON.parse(localStorage.getItem("userInfo"));
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState([]);
@@ -41,6 +41,9 @@ function SideDrawer(props) {
 
     const handleLogout = () => {
         localStorage.removeItem("userInfo");
+        setUser("");
+        setSelectedChat({});
+        setChats([]);
         history.push("/");
     };
 
@@ -78,7 +81,7 @@ function SideDrawer(props) {
         }
     };
 
-    const accessChat = async (userId) => {
+    const accessChat = async (userFet) => {
         try {
             setLoadingChat(true);
             const config = {
@@ -87,7 +90,12 @@ function SideDrawer(props) {
                     "Authorization": `Bearer ${user.token}`,
                 },
             };
-            const { data } = await axios.post("/api/v1/chat/", { userId }, config);
+            console.log(user.token);
+            const { data } = await axios.post(
+                "/api/v1/chat/",
+                { userId: userFet._id },
+                config
+            );
             if (!chats.find((c) => c._id === data._id)) {
                 setChats([data, ...chats]);
             }
@@ -196,7 +204,7 @@ function SideDrawer(props) {
                                 return (
                                     <UserItem
                                         key={user._id}
-                                        payload={{ user, accessChat }}
+                                        payload={{ user, handleClick: accessChat }}
                                     />
                                 );
                             })
@@ -221,6 +229,13 @@ const mapDispatchToProps = (dispatch) => {
         setChats: (data) => {
             const action = {
                 type: "CHATS",
+                payload: data,
+            };
+            dispatch(action);
+        },
+        setUser: (data) => {
+            const action = {
+                type: "SET_USER",
                 payload: data,
             };
             dispatch(action);

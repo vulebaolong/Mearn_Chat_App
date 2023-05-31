@@ -2,11 +2,11 @@ import { Avatar, Box, Text } from "@chakra-ui/react";
 import { color } from "framer-motion";
 
 function UserItem(props) {
-    const { user, accessChat } = props.payload;
+    const { user, handleClick } = props.payload;
     return (
         <Box
             onClick={() => {
-                accessChat(user._id);
+                handleClick(user);
             }}
             cursor={"pointer"}
             _hover={{

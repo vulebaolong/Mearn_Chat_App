@@ -2,15 +2,14 @@ import { GET_USER } from "../constant/chatContant";
 
 const initState = {
     user: JSON.parse(localStorage.getItem("userInfo")),
-    selectedChat: "",
+    selectedChat: {},
     chats: [],
 };
 
 export const chatReducer = (state = initState, { type, payload }) => {
-    if (type === GET_USER) {
+    if (type === "SET_USER") {
         const coppyState = JSON.parse(JSON.stringify(state));
-        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-        coppyState.user = userInfo;
+        coppyState.user = payload;
         return coppyState;
     }
 

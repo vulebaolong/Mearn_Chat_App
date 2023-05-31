@@ -12,8 +12,10 @@ import {
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
+import { connect } from "react-redux";
 
-function Login() {
+function Login(props) {
+    const { setUser } = props;
     const [show, setShow] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -61,9 +63,10 @@ function Login() {
                 isClosable: true,
                 position: "bottom",
             });
+            localStorage.setItem("userInfo", JSON.stringify(data));
+            setUser(data);
             setLoading(false);
             history.push("/chats");
-            localStorage.setItem("userInfo", JSON.stringify(data));
         } catch (error) {
             console.log("👙  error: ", error);
             toast({
@@ -136,4 +139,16 @@ function Login() {
     );
 }
 
-export default Login;
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setUser: (data) => {
+            const action = {
+                type: "SET_USER",
+                payload: data,
+            };
+            dispatch(action);
+        },
+    };
+};
+
+export default connect(null, mapDispatchToProps)(Login);

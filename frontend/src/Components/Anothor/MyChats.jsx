@@ -5,9 +5,10 @@ import axios from "axios";
 import { AddIcon } from "@chakra-ui/icons";
 import ChatLoading from "./ChatLoading";
 import { getSender } from "../../util/chatLogic";
+import GroupChatModal from "./GroupChatModal";
 
 function MyChats(props) {
-    const { chatReducer, setChats, setSelectedChat } = props;
+    const { chatReducer, setChats, setSelectedChat, fetchAgain } = props;
     const { user, selectedChat, chats } = chatReducer;
     const [loggedUser, setLoggedUser] = useState();
     const toast = useToast();
@@ -22,7 +23,6 @@ function MyChats(props) {
                 },
             };
             const { data } = await axios.get("/api/v1/chat/", config);
-            console.log(data);
             setChats(data);
         } catch (error) {
             toast({
@@ -37,13 +37,13 @@ function MyChats(props) {
     };
 
     useEffect(() => {
-        setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
+        setLoggedUser(user);
         fetchChat();
-    }, []);
+    }, [fetchAgain]);
 
     return (
         <Box
-            display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
+            display={{ base: selectedChat._id ? "none" : "flex", md: "flex" }}
             flexDir={"column"}
             alignItems={"center"}
             p={3}
@@ -61,13 +61,15 @@ function MyChats(props) {
                 alignItems={"center"}
             >
                 My Chat
-                <Button
-                    display={"flex"}
-                    fontSize={{ base: "17px", md: "10px", lg: "17px" }}
-                    rightIcon={<AddIcon />}
-                >
-                    New Group Chat
-                </Button>
+                <GroupChatModal>
+                    <Button
+                        display={"flex"}
+                        fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+                        rightIcon={<AddIcon />}
+                    >
+                        New Group Chat
+                    </Button>
+                </GroupChatModal>
             </Box>
             <Box
                 display={"flex"}
