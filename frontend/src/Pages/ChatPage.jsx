@@ -4,7 +4,7 @@ import { Box } from "@chakra-ui/react";
 import SideDrawer from "../Components/Anothor/SideDrawer";
 import MyChats from "../Components/Anothor/MyChats";
 import ChatBox from "../Components/Anothor/ChatBox";
-import { connect } from "mongoose";
+import { connect } from "react-redux";
 
 function ChatPage(props) {
     const { user } = props;
