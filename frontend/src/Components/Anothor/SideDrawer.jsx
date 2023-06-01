@@ -1,5 +1,6 @@
 import {
     Avatar,
+    Badge,
     Box,
     Button,
     Drawer,
@@ -27,9 +28,11 @@ import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserItem from "./UserItem";
 import { connect } from "react-redux";
+import { getSender } from "../../util/chatLogic";
 
 function SideDrawer(props) {
-    const { setSelectedChat, chats, setChats, setUser } = props;
+    const { setSelectedChat, chats, setChats, setUser, notification, setNotification } =
+        props;
     const user = JSON.parse(localStorage.getItem("userInfo"));
     const [search, setSearch] = useState("");
     const [searchResult, setSearchResult] = useState([]);
@@ -90,7 +93,6 @@ function SideDrawer(props) {
                     "Authorization": `Bearer ${user.token}`,
                 },
             };
-            console.log(user.token);
             const { data } = await axios.post(
                 "/api/v1/chat/",
                 { userId: userFet._id },
@@ -144,9 +146,32 @@ function SideDrawer(props) {
                 <div>
                     <Menu>
                         <MenuButton p={1}>
+                            <Badge colorScheme="red">{notification.length}</Badge>
                             <BellIcon fontSize={"2xl"} m={1} />
                         </MenuButton>
-                        {/* <MenuList></MenuList> */}
+                        <MenuList pl={2}>
+                            {notification.length === 0 && "Không có tin nhắn mới"}
+                            {notification.map((noti) => {
+                                return (
+                                    <MenuItem
+                                        key={noti._id}
+                                        onClick={() => {
+                                            setSelectedChat(noti.chat);
+                                            setNotification(
+                                                notification.filter((n) => n !== noti)
+                                            );
+                                        }}
+                                    >
+                                        {noti.chat.isGroupChat
+                                            ? `Tin nhắn mới ${noti.chat.chatName}`
+                                            : `Tin nhắn mới của: ${getSender(
+                                                  user,
+                                                  noti.chat.users
+                                              )}`}
+                                    </MenuItem>
+                                );
+                            })}
+                        </MenuList>
                     </Menu>
                     <Menu>
                         <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
@@ -240,12 +265,20 @@ const mapDispatchToProps = (dispatch) => {
             };
             dispatch(action);
         },
+        setNotification: (data) => {
+            const action = {
+                type: "NOTIFICATION",
+                payload: data,
+            };
+            dispatch(action);
+        },
     };
 };
 
 const mapStateToProps = (state) => {
     return {
         chats: state.chatReducer.chats,
+        notification: state.chatReducer.notification,
     };
 };
 

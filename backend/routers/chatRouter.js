@@ -8,7 +8,7 @@ chatRouter.get("/", authMiddleware.protect, chatController.fectChats);
 chatRouter.post("/creategroup", authMiddleware.protect, chatController.createGroupChat);
 chatRouter.put("/renamegroup", authMiddleware.protect, chatController.renameGroupChat);
 chatRouter.put("/addgroup", authMiddleware.protect, chatController.addToGroupChat);
-chatRouter.delete(
+chatRouter.put(
     "/deleteusergroup",
     authMiddleware.protect,
     chatController.deleteUserGroup

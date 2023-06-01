@@ -51,7 +51,6 @@ const accessChat = asyncHandler(async (req, res) => {
 
 const fectChats = asyncHandler(async (req, res) => {
     try {
-        console.log(req.user);
         Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
             .populate("users", "-password")
             .populate("groupAdmin", "-password")
@@ -120,6 +119,7 @@ const renameGroupChat = asyncHandler(async (req, res) => {
 
 const addToGroupChat = asyncHandler(async (req, res) => {
     const { chatId, userId } = req.body;
+    console.log({ chatId, userId });
     const added = await Chat.findByIdAndUpdate(
         chatId,
         {
